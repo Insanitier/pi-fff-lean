@@ -1,0 +1,25 @@
+{
+  "name": "opensec-pi-fff-lean",
+  "version": "0.11.1",
+  "private": true,
+  "type": "module",
+  "description": "Lean tool definitions for opensec-pi-fff: same behaviour, ~53% fewer always-on tokens.",
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./index.js"
+    ]
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "measure": "node scripts/measure.js",
+    "smoke": "BUN_BE_BUN=1 pi-bolt scripts/smoke.js",
+    "smoke:no-jit": "OPENSEC_FFF_BACKEND=ffi-rs BUN_BE_BUN=1 pi-bolt scripts/smoke.js"
+  },
+  "dependencies": {
+    "opensec-pi-fff": "0.11.1"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.52"
+  }
+}
