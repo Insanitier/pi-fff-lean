@@ -67,6 +67,42 @@ In `override` mode the tools register as `grep` and `find` and replace Pi's buil
 names it already knows and you pay for one set of definitions rather than two. This is also why the built-in
 `grep`/`find` should stay out of `defaultTools`.
 
+## Updating
+
+There are two layers, and only one of them is automatic.
+
+### This package: `pi update`
+
+```bash
+pi-bolt update git:github.com/Insanitier/pi-fff-lean   # or: pi-bolt update --extensions
+```
+
+For a git package Pi fetches the ref the clone tracks (`origin/main`), and when it has moved it does
+`git reset --hard`, `git clean -fdx`, then `npm install --omit=dev --legacy-peer-deps`. So a push to `main`
+is all it takes. When nothing has moved it only reinstalls dependencies that are missing.
+
+Because of the `git clean -fdx`, `node_modules` must never be committed, and `package-lock.json` must be:
+it is what makes the reinstall resolve the same platform binaries every time.
+
+### Upstream: by hand, on purpose
+
+The dependency is pinned to an exact version, so a new `opensec-pi-fff` release does not arrive on its own.
+To take one:
+
+```bash
+cd <this repo>
+npm install opensec-pi-fff@<new version>
+npm test          # a renamed or removed schema field fails here
+npm run measure   # update the table above if the numbers moved
+git commit -am "opensec-pi-fff <new version>" && git push
+pi-bolt update git:github.com/Insanitier/pi-fff-lean
+```
+
+This is deliberate. The trimming depends on upstream's schema *field names*, and an automatic upgrade has
+two failure modes: a removed field makes `applyFieldDescriptions` throw at startup (loud, good), but an
+*added* field is silently left untrimmed and the token count creeps back (quiet, bad). The test suite turns
+the second one into something you have to look at.
+
 ## Tests
 
 ```bash
